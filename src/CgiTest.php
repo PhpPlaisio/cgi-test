@@ -754,10 +754,20 @@ abstract class CgiTest extends TestCase
     self::assertSame('/foo/1', $part);
 
     // Tests for false.
-    $part = Abc::$cgi->putBool('foo', false);
+    $part = Abc::$cgi->putBool('foo', false, true);
     self::assertSame('/foo/0', $part);
 
-    $part = Abc::$cgi->putBool('foo', null);
+    $part = Abc::$cgi->putBool('foo', false, false);
+    self::assertSame('', $part);
+
+    $part = Abc::$cgi->putBool('foo', false);
+    self::assertSame('', $part);
+
+    // Tests for null.
+    $part = Abc::$cgi->putBool('foo', null, true);
+    self::assertSame('', $part);
+
+    $part = Abc::$cgi->putBool('foo', null, false);
     self::assertSame('', $part);
   }
 
