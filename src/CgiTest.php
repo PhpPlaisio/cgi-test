@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace SetBased\Abc\Cgi\Test;
 
@@ -782,7 +783,7 @@ abstract class CgiTest extends TestCase
     self::assertSame('/foo/123.45', $part);
 
     // Tests for false.
-    $part = Abc::$cgi->putFloat('foo', false);
+    $part = Abc::$cgi->putFloat('foo', 0);
     self::assertSame('/foo/0', $part);
 
     $part = Abc::$cgi->putFloat('foo', null);
