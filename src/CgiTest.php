@@ -19,7 +19,7 @@ abstract class CgiTest extends TestCase
    *
    * @param string $method The method to be tested.
    */
-  public function baseGetFloat1($method)
+  public function baseGetFloat1(string $method): void
   {
     // Test for null with default.
     $_GET['foo'] = null;
@@ -54,7 +54,7 @@ abstract class CgiTest extends TestCase
    *
    * @param string $method The method to be tested.
    */
-  public function baseGetFloat2($method)
+  public function baseGetFloat2(string $method): void
   {
     $_GET['foo'] = 'hello';
     Abc::$cgi->$method('foo');
@@ -66,7 +66,7 @@ abstract class CgiTest extends TestCase
    *
    * @param string $method The method to be tested.
    */
-  public function baseGetId1($method)
+  public function baseGetId1(string $method): void
   {
     // Test for null with default.
     $_GET['foo'] = null;
@@ -93,7 +93,7 @@ abstract class CgiTest extends TestCase
    *
    * @param string $method The method to be tested.
    */
-  public function baseGetId2($method)
+  public function baseGetId2(string $method): void
   {
     $_GET['foo'] = 'hello';
     Abc::$cgi->$method('foo', 'bar');
@@ -105,7 +105,7 @@ abstract class CgiTest extends TestCase
    *
    * @param string $method The method to be tested.
    */
-  public function baseGetInt1($method)
+  public function baseGetInt1(string $method): void
   {
     // Test for null with default.
     $_GET['foo'] = null;
@@ -140,7 +140,7 @@ abstract class CgiTest extends TestCase
    *
    * @param string $method The method to be tested.
    */
-  public function baseGetInt2($method)
+  public function baseGetInt2(string $method): void
   {
     $_GET['foo'] = 'hello';
     Abc::$cgi->$method('foo');
@@ -152,7 +152,7 @@ abstract class CgiTest extends TestCase
    *
    * @param string $method The method to be tested.
    */
-  public function baseGetString1($method)
+  public function baseGetString1(string $method): void
   {
     // Test for null with default.
     $_GET['foo'] = null;
@@ -203,7 +203,7 @@ abstract class CgiTest extends TestCase
    *
    * @param string $method The method to be tested.
    */
-  public function baseGetUrl1($method)
+  public function baseGetUrl1(string $method): void
   {
     // Test for null with default.
     $_GET['foo'] = null;
@@ -239,7 +239,7 @@ abstract class CgiTest extends TestCase
    *
    * @param string $method The method to be tested.
    */
-  public function baseGetUrl2($method)
+  public function baseGetUrl2(string $method): void
   {
     $_GET['foo'] = 'https://www.setbased.nl/';
     Abc::$cgi->$method('foo');
@@ -249,7 +249,7 @@ abstract class CgiTest extends TestCase
   /**
    * Test cases for getManBool.
    */
-  public function testGetManBool1()
+  public function testGetManBool1(): void
   {
     // Tests for true.
     $_GET['foo'] = '1';
@@ -284,7 +284,7 @@ abstract class CgiTest extends TestCase
    *
    * @expectedException \SetBased\Abc\Exception\InvalidUrlException
    */
-  public function testGetManBool2()
+  public function testGetManBool2(): void
   {
     $_GET['foo'] = 'hello, world';
     Abc::$cgi->getManBool('foo');
@@ -778,12 +778,10 @@ abstract class CgiTest extends TestCase
    */
   public function testPutFloat1()
   {
-    // Tests for true.
     $part = Abc::$cgi->putFloat('foo', 123.45);
     self::assertSame('/foo/123.45', $part);
 
-    // Tests for false.
-    $part = Abc::$cgi->putFloat('foo', 0);
+    $part = Abc::$cgi->putFloat('foo', 0.0);
     self::assertSame('/foo/0', $part);
 
     $part = Abc::$cgi->putFloat('foo', null);
