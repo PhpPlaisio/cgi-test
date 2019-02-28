@@ -360,6 +360,19 @@ abstract class CgiTest extends TestCase
    *
    * @return array
    */
+  public function invalidCasesGetManString(): array
+  {
+    $cases = $this->invalidCasesGetOptString();
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns invalid test cases for method getManUrl.
+   *
+   * @return array
+   */
   public function invalidCasesGetManUrl(): array
   {
     $cases = $this->invalidCasesGetOptUrl();
@@ -390,7 +403,24 @@ abstract class CgiTest extends TestCase
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Retutns invalid test cases for method getOptUrl.
+   * Returns invalid test cases for method getOptUrl.
+   *
+   * @return array
+   */
+  public function invalidCasesGetOptString(): array
+  {
+    $cases = [];
+
+    // A resource can not be casted to a string.
+    $cases[] = ['variable' => 'foo',
+                'value'    => fopen('php://stdin', 'r')];
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns invalid test cases for method getOptUrl.
    *
    * @return array
    */
@@ -818,7 +848,24 @@ abstract class CgiTest extends TestCase
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Valid test cases for getManUrl.
+   * Invalid test cases for getManString.
+   *
+   * @param string $variable The name of the CGI variable.
+   * @param mixed  $value    The value of the CGI variable.
+   *
+   * @dataProvider invalidCasesGetManString
+   */
+  public function testInvalidGetManString(string $variable, $value)
+  {
+    $_GET[$variable] = $value;
+
+    $this->expectException(InvalidUrlException::class);
+    Abc::$cgi->getManString($variable);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Invalid test cases for getManUrl.
    *
    * @param string      $variable      The name of the CGI variable.
    * @param string|null $value         The value of the CGI variable.
@@ -845,6 +892,23 @@ abstract class CgiTest extends TestCase
 
     $this->expectException(InvalidUrlException::class);
     Abc::$cgi->getManUrl($variable, $default, $forceRelative);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Invalid test cases for getOptString.
+   *
+   * @param string $variable The name of the CGI variable.
+   * @param mixed  $value    The value of the CGI variable.
+   *
+   * @dataProvider invalidCasesGetOptString
+   */
+  public function testInvalidGetOptString(string $variable, $value)
+  {
+    $_GET[$variable] = $value;
+
+    $this->expectException(InvalidUrlException::class);
+    Abc::$cgi->getOptString($variable);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -877,6 +941,7 @@ abstract class CgiTest extends TestCase
     $this->expectException(InvalidUrlException::class);
     Abc::$cgi->getOptUrl($variable, $default, $forceRelative);
   }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
