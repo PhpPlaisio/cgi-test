@@ -149,57 +149,6 @@ abstract class CgiTest extends TestCase
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Test cases for both getManString and getOptString.
-   *
-   * @param string $method The method to be tested.
-   */
-  public function baseGetString1(string $method): void
-  {
-    // Test for null with default.
-    $_GET['foo'] = null;
-    $value       = Abc::$cgi->$method('foo', 'bar');
-    self::assertSame('bar', $value);
-
-    unset($_GET['foo']);
-    $value = Abc::$cgi->$method('foo', 'bar');
-    self::assertSame('bar', $value);
-
-    // Test for empty string with default.
-    $_GET['foo'] = '';
-    $value       = Abc::$cgi->$method('foo', 'bar');
-    self::assertSame('bar', $value);
-
-    // Test for normal string.
-    $_GET['foo'] = 'bar';
-    $value       = Abc::$cgi->$method('foo');
-    self::assertSame('bar', $value);
-
-    // Test for normal string with default.
-    $_GET['foo'] = 'bar';
-    $value       = Abc::$cgi->$method('foo', 'eggs');
-    self::assertSame('bar', $value);
-
-    // Test for special characters.
-    $_GET['foo'] = '/';
-    $value       = Abc::$cgi->$method('foo');
-    self::assertSame('/', $value);
-
-    $_GET['foo'] = 'https://www.setbased.nl/';
-    $value       = Abc::$cgi->$method('foo');
-    self::assertSame('https://www.setbased.nl/', $value);
-
-    // Test for special characters with default.
-    $_GET['foo'] = '/';
-    $value       = Abc::$cgi->$method('foo', 'spam');
-    self::assertSame('/', $value);
-
-    $_GET['foo'] = 'https://www.setbased.nl/';
-    $value       = Abc::$cgi->$method('foo', 'spam');
-    self::assertSame('https://www.setbased.nl/', $value);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
    * Returns test cases for method putBool.
    *
    * @return array
@@ -364,6 +313,19 @@ abstract class CgiTest extends TestCase
   {
     $cases = $this->invalidCasesGetOptString();
 
+    // Empty values.
+    $cases[] = ['variable' => 'foo',
+                'value'    => '',
+                'unset'    => null];
+
+    $cases[] = ['variable' => 'foo',
+                'value'    => null,
+                'unset'    => false];
+
+    $cases[] = ['variable' => 'foo',
+                'value'    => null,
+                'unset'    => true];
+
     return $cases;
   }
 
@@ -413,7 +375,8 @@ abstract class CgiTest extends TestCase
 
     // A resource can not be casted to a string.
     $cases[] = ['variable' => 'foo',
-                'value'    => fopen('php://stdin', 'r')];
+                'value'    => fopen('php://stdin', 'r'),
+                'unset'    => null];
 
     return $cases;
   }
@@ -662,51 +625,6 @@ abstract class CgiTest extends TestCase
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Test cases for getManString.
-   */
-  public function testGetManString()
-  {
-    $this->baseGetString1('getManString');
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Test case empty value.
-   */
-  public function testGetManString2()
-  {
-    $_GET['foo'] = '';
-
-    $this->expectException(InvalidUrlException::class);
-    Abc::$cgi->getManString('foo');
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Test case empty value.
-   */
-  public function testGetManString3()
-  {
-    $_GET['foo'] = null;
-
-    $this->expectException(InvalidUrlException::class);
-    Abc::$cgi->getManString('foo');
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Test case empty value.
-   */
-  public function testGetManString4()
-  {
-    unset($_GET['foo']);
-
-    $this->expectException(InvalidUrlException::class);
-    Abc::$cgi->getManString('foo');
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
    * Test cases for getOptBool.
    */
   public function testGetOptBool1()
@@ -818,46 +736,24 @@ abstract class CgiTest extends TestCase
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Test cases for getOptString.
-   */
-  public function testGetOptString1()
-  {
-    $this->baseGetString1('getOptString');
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Test cases for getOptString.
-   */
-  public function testGetOptString2()
-  {
-    // Test for null.
-    $_GET['foo'] = null;
-    $value       = Abc::$cgi->getOptString('foo');
-    self::assertNull($value);
-
-    unset($_GET['foo']);
-    $value = Abc::$cgi->getOptString('foo');
-    self::assertNull($value);
-
-    // Test for empty string.
-    $_GET['foo'] = '';
-    $value       = Abc::$cgi->getOptString('foo');
-    self::assertNull($value);
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
    * Invalid test cases for getManString.
    *
-   * @param string $variable The name of the CGI variable.
-   * @param mixed  $value    The value of the CGI variable.
+   * @param string    $variable The name of the CGI variable.
+   * @param mixed     $value    The value of the CGI variable.
+   * @param bool|null $unset    If true the CGI variable will be unset.
    *
    * @dataProvider invalidCasesGetManString
    */
-  public function testInvalidGetManString(string $variable, $value)
+  public function testInvalidGetManString(string $variable, $value, ?bool $unset): void
   {
-    $_GET[$variable] = $value;
+    if ($unset)
+    {
+      unset($_GET[$variable]);
+    }
+    else
+    {
+      $_GET[$variable] = $value;
+    }
 
     $this->expectException(InvalidUrlException::class);
     Abc::$cgi->getManString($variable);
@@ -879,7 +775,7 @@ abstract class CgiTest extends TestCase
                                        ?string $value,
                                        ?string $default,
                                        bool $forceRelative,
-                                       ?bool $unset)
+                                       ?bool $unset): void
   {
     if ($unset)
     {
@@ -898,14 +794,22 @@ abstract class CgiTest extends TestCase
   /**
    * Invalid test cases for getOptString.
    *
-   * @param string $variable The name of the CGI variable.
-   * @param mixed  $value    The value of the CGI variable.
+   * @param string    $variable The name of the CGI variable.
+   * @param mixed     $value    The value of the CGI variable.
+   * @param bool|null $unset    If true the CGI variable will be unset.
    *
    * @dataProvider invalidCasesGetOptString
    */
-  public function testInvalidGetOptString(string $variable, $value)
+  public function testInvalidGetOptString(string $variable, $value, ?bool $unset): void
   {
-    $_GET[$variable] = $value;
+    if ($unset)
+    {
+      unset($_GET[$variable]);
+    }
+    else
+    {
+      $_GET[$variable] = $value;
+    }
 
     $this->expectException(InvalidUrlException::class);
     Abc::$cgi->getOptString($variable);
@@ -927,7 +831,7 @@ abstract class CgiTest extends TestCase
                                        ?string $value,
                                        ?string $default,
                                        bool $forceRelative,
-                                       ?bool $unset)
+                                       ?bool $unset): void
   {
     if ($unset)
     {
@@ -941,7 +845,6 @@ abstract class CgiTest extends TestCase
     $this->expectException(InvalidUrlException::class);
     Abc::$cgi->getOptUrl($variable, $default, $forceRelative);
   }
-
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -975,6 +878,7 @@ abstract class CgiTest extends TestCase
     $part = Abc::$cgi->putFloat($variable, $value);
     self::assertSame($expected, $part);
   }
+
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -1058,6 +962,34 @@ abstract class CgiTest extends TestCase
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
+   * Valid test cases for getManString.
+   *
+   * @param string      $variable The name of the CGI variable.
+   * @param string|null $value    The value of the CGI variable.
+   * @param string|null $default  The default value.
+   * @param string      $expected The expected result.
+   *
+   * @dataProvider validCasesGetManString
+   */
+  public function testValidGetManString(string $variable,
+                                        ?string $value,
+                                        ?string $default,
+                                        string $expected): void
+  {
+    $_GET[$variable] = $value;
+    $url             = Abc::$cgi->getManString($variable, $default);
+    self::assertSame($expected, $url);
+
+    if ($value===null)
+    {
+      unset($_GET[$variable]);
+      $url = Abc::$cgi->getManString($variable, $default);
+      self::assertSame($expected, $url);
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
    * Valid test cases for getManUrl.
    *
    * @param string      $variable      The name of the CGI variable.
@@ -1072,7 +1004,7 @@ abstract class CgiTest extends TestCase
                                      ?string $value,
                                      ?string $default,
                                      bool $forceRelative,
-                                     string $expected)
+                                     string $expected): void
   {
     $_GET[$variable] = $value;
     $url             = Abc::$cgi->getManUrl($variable, $default, $forceRelative);
@@ -1082,6 +1014,34 @@ abstract class CgiTest extends TestCase
     {
       unset($_GET[$variable]);
       $url = Abc::$cgi->getManUrl($variable, $default, $forceRelative);
+      self::assertSame($expected, $url);
+    }
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Valid test cases for getOptString.
+   *
+   * @param string      $variable The name of the CGI variable.
+   * @param string|null $value    The value of the CGI variable.
+   * @param string|null $default  The default value.
+   * @param string      $expected The expected result.
+   *
+   * @dataProvider validCasesGetOptString
+   */
+  public function testValidGetOptString(string $variable,
+                                        ?string $value,
+                                        ?string $default,
+                                        ?string $expected): void
+  {
+    $_GET[$variable] = $value;
+    $url             = Abc::$cgi->getOptString($variable, $default);
+    self::assertSame($expected, $url);
+
+    if ($value===null)
+    {
+      unset($_GET[$variable]);
+      $url = Abc::$cgi->getOptString($variable, $default);
       self::assertSame($expected, $url);
     }
   }
@@ -1102,7 +1062,7 @@ abstract class CgiTest extends TestCase
                                      ?string $value,
                                      ?string $default,
                                      bool $forceRelative,
-                                     ?string $expected)
+                                     ?string $expected): void
   {
     $_GET[$variable] = $value;
     $url             = Abc::$cgi->getOptUrl($variable, $default, $forceRelative);
@@ -1115,10 +1075,68 @@ abstract class CgiTest extends TestCase
       self::assertSame($expected, $url);
     }
   }
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns valid test cases for method getManString.
+   *
+   * @return array
+   */
+  public function validCasesGetManString(): array
+  {
+    $cases = [];
+
+    // Test for null with default.
+    $cases[] = ['variable' => 'foo',
+                'value'    => null,
+                'default'  => 'bar',
+                'expected' => 'bar'];
+
+    // Test for empty string with default.
+    $cases[] = ['variable' => 'foo',
+                'value'    => '',
+                'default'  => 'bar',
+                'expected' => 'bar'];
+
+    // Test for normal string.
+    $cases[] = ['variable' => 'foo',
+                'value'    => 'bar',
+                'default'  => null,
+                'expected' => 'bar'];
+
+    // Test for normal string with default.
+    $cases[] = ['variable' => 'foo',
+                'value'    => 'bar',
+                'default'  => 'eggs',
+                'expected' => 'bar'];
+
+    // Test for special characters.
+    $cases[] = ['variable' => 'foo',
+                'value'    => '/',
+                'default'  => null,
+                'expected' => '/'];
+
+    $cases[] = ['variable' => 'foo',
+                'value'    => 'https://www.setbased.nl/',
+                'default'  => null,
+                'expected' => 'https://www.setbased.nl/'];
+
+    // Test for special characters with default.
+    $cases[] = ['variable' => 'foo',
+                'value'    => '/',
+                'default'  => 'spam',
+                'expected' => '/'];
+
+    $cases[] = ['variable' => 'foo',
+                'value'    => 'https://www.setbased.nl/',
+                'default'  => 'spam',
+                'expected' => 'https://www.setbased.nl/'];
+
+    return $cases;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Retutns valid test cases for method getManUrl.
+   * Returns valid test cases for method getManUrl.
    *
    * @return array
    */
@@ -1158,6 +1176,31 @@ abstract class CgiTest extends TestCase
                 'default'       => 'spam',
                 'forceRelative' => false,
                 'expected'      => 'https://www.setbased.nl/'];
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns valid test cases for method getOptString.
+   *
+   * @return array
+   */
+  public function validCasesGetOptString(): array
+  {
+    $cases = $this->validCasesGetManString();
+
+    // Test for null.
+    $cases[] = ['variable' => 'foo',
+                'value'    => null,
+                'default'  => null,
+                'expected' => null];
+
+    // Test for empty string.
+    $cases[] = ['variable' => 'foo',
+                'value'    => '',
+                'default'  => null,
+                'expected' => null];
 
     return $cases;
   }
