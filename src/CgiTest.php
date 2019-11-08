@@ -195,7 +195,7 @@ abstract class CgiTest extends TestCase
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   * Retuns test cases for method putUrl.
+   * Returns test cases for method putUrl.
    *
    * @return array
    */
