@@ -10,7 +10,7 @@
     "php": ">=7.1.0",
     "setbased/abc": "*",
     "setbased/abc-cgi": "^1.0.0",
-    "setbased/abc-exception": "^1.0.0",
+    "setbased/abc-exception": "^2.0.0",
     "phpunit/phpunit": "^7.0.0 || ^8.0.0"
   },
   "require-dev": {
