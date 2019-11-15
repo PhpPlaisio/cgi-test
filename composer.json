@@ -1,16 +1,16 @@
 {
-  "name": "setbased/abc-cgi-test",
-  "description": "ABC-Framework: CGI",
+  "name": "plaisio/cgi-test",
+  "description": "PhpPlaisio: CGI",
   "keywords": [
-    "ABC-Framework",
+    "PhpPlaisio",
     "CGI"
   ],
   "license": "MIT",
   "require": {
     "php": ">=7.1.0",
-    "setbased/abc": "*",
-    "setbased/abc-cgi": "^1.0.0",
-    "setbased/abc-exception": "^2.0.0",
+    "plaisio/kernel": "^1.0.0",
+    "plaisio/cgi": "^2.0.0",
+    "plaisio/exception": "^3.0.0",
     "phpunit/phpunit": "^7.0.0 || ^8.0.0"
   },
   "require-dev": {
@@ -18,7 +18,7 @@
   },
   "autoload": {
     "psr-4": {
-      "SetBased\\Abc\\Cgi\\Test\\": "src/"
+      "Plaisio\\Cgi\\Test\\": "src/"
     }
   },
   "config": {
