@@ -9,8 +9,8 @@
   "require": {
     "php": ">=7.1.0",
     "plaisio/kernel": "^1.0.0",
-    "plaisio/cgi": "^2.0.0",
-    "plaisio/exception": "^3.0.0",
+    "plaisio/cgi": "^1.0.0",
+    "plaisio/exception": "^1.0.0",
     "phpunit/phpunit": "^7.0.0 || ^8.0.0"
   },
   "require-dev": {
