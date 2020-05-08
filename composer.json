@@ -11,7 +11,7 @@
     "phpunit/phpunit": "^9.0",
     "plaisio/cgi": "^1.0",
     "plaisio/exception": "^1.0",
-    "plaisio/kernel": "^1.0"
+    "plaisio/kernel": "^2.0"
   },
   "require-dev": {
     "phing/phing": "^2.0"

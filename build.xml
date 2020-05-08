@@ -7,8 +7,4 @@
     <target name="build">
         <echo message=""/>
     </target>
-
-    <target name="unit">
-        <echo message=""/>
-    </target>
 </project>
