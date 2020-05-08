@@ -79,11 +79,11 @@ abstract class CgiTest extends TestCase
     self::assertSame(123, $value);
 
     // Test with value.
-    $_GET['foo'] = Nub::$nub->nub::obfuscate(3, 'bar');
+    $_GET['foo'] = Nub::$nub->obfuscate(3, 'bar');
     $value       = Nub::$nub->cgi->$method('foo', 'bar');
     self::assertSame(3, $value);
 
-    $_GET['foo'] = Nub::$nub->nub::obfuscate(2, 'bar');
+    $_GET['foo'] = Nub::$nub->obfuscate(2, 'bar');
     $value       = Nub::$nub->cgi->$method('foo', 'bar', 123);
     self::assertSame(2, $value);
   }
@@ -227,11 +227,11 @@ abstract class CgiTest extends TestCase
             ['variable' => 'foo',
              'value'    => 0,
              'label'    => 'foo',
-             'expected' => '/foo/'.Nub::$nub->nub::obfuscate(0, 'foo')],
+             'expected' => '/foo/'.Nub::$nub->obfuscate(0, 'foo')],
             ['variable' => 'foo',
              'value'    => 123,
              'label'    => 'foo',
-             'expected' => '/foo/'.Nub::$nub->nub::obfuscate(123, 'foo')]];
+             'expected' => '/foo/'.Nub::$nub->obfuscate(123, 'foo')]];
   }
 
   //--------------------------------------------------------------------------------------------------------------------
