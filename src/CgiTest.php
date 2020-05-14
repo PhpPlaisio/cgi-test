@@ -228,6 +228,8 @@ abstract class CgiTest extends TestCase
    */
   public function casesPutId(): array
   {
+    $this->setUp();
+
     return [['variable' => 'foo',
              'value'    => null,
              'label'    => 'foo',
