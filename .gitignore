@@ -1,5 +1,6 @@
 /.idea/
-/bin/phing
-/bin/phpunit
+/bin/
 /composer.lock
+/custom.task.properties
+/custom.type.properties
 /vendor/

@@ -17,11 +17,11 @@ abstract class CgiTest extends TestCase
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * The kernel for testing purposes.
-   * 
+   *
    * @var PlaisioKernel
    */
-  protected $kernel;
-  
+  protected PlaisioKernel $kernel;
+
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Test cases for both getManFloat and getOptFloat.
@@ -110,7 +110,7 @@ abstract class CgiTest extends TestCase
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
-   *Test cases for both getManInt and getOptint.
+   * Test cases for both getManInt and getOptInt.
    *
    * @param string $method The method to be tested.
    */
