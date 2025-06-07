@@ -37,7 +37,6 @@
         </exec>
     </target>
 
-    <target name="build">
-        <echo message=""/>
+    <target name="build" depends="updated">
     </target>
 </project>

@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Plaisio\Cgi\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plaisio\Exception\InvalidUrlException;
+use Plaisio\Kernel\Nub;
 use Plaisio\PlaisioKernel;
 
 /**
@@ -21,6 +23,418 @@ abstract class CgiTest extends TestCase
    * @var PlaisioKernel
    */
   protected PlaisioKernel $kernel;
+
+  //--------------------------------------------------------------------------------------------------------------------
+
+  /**
+   * Returns test cases for method putBool.
+   *
+   * @return array
+   */
+  public static function casesPutBool(): array
+  {
+    $cases = [];
+
+    // Test cases for true.
+    $cases[] = ['variable'  => 'foo',
+                'value'     => true,
+                'mandatory' => false,
+                'expected'  => '/foo/1'];
+
+    $cases[] = ['variable'  => 'foo',
+                'value'     => true,
+                'mandatory' => true,
+                'expected'  => '/foo/1'];
+
+    // Test cases for false.
+    $cases[] = ['variable'  => 'foo',
+                'value'     => false,
+                'mandatory' => true,
+                'expected'  => '/foo/0'];
+
+    $cases[] = ['variable'  => 'foo',
+                'value'     => false,
+                'mandatory' => false,
+                'expected'  => ''];
+
+    // Test cases for null.
+    $cases[] = ['variable'  => 'foo',
+                'value'     => null,
+                'mandatory' => false,
+                'expected'  => ''];
+
+    $cases[] = ['variable'  => 'foo',
+                'value'     => null,
+                'mandatory' => true,
+                'expected'  => ''];
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns test cases for method putUrl.
+   *
+   * @return array
+   */
+  public static function casesPutFloat(): array
+  {
+    return [['variable' => 'foo',
+             'value'    => null,
+             'expected' => ''],
+            ['variable' => 'foo',
+             'value'    => 0.0,
+             'expected' => '/foo/0'],
+            ['variable' => 'foo',
+             'value'    => 123.45,
+             'expected' => '/foo/123.45']];
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns test cases for method putId.
+   *
+   * @return array
+   */
+  public static function casesPutId(): array
+  {
+    return [['variable' => 'foo',
+             'value'    => null,
+             'label'    => 'foo',
+             'expected' => ''],
+            ['variable' => 'foo',
+             'value'    => 0,
+             'label'    => 'foo',
+             'expected' => '/foo/'.Nub::$nub->obfuscator::encode(0, 'foo')],
+            ['variable' => 'foo',
+             'value'    => 123,
+             'label'    => 'foo',
+             'expected' => '/foo/'.Nub::$nub->obfuscator::encode(123, 'foo')]];
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns test cases for method putInt.
+   *
+   * @return array
+   */
+  public static function casesPutInt(): array
+  {
+    return [['variable' => 'foo',
+             'value'    => null,
+             'expected' => ''],
+            ['variable' => 'foo',
+             'value'    => 0,
+             'expected' => '/foo/0'],
+            ['variable' => 'foo',
+             'value'    => 123456,
+             'expected' => '/foo/123456']];
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns test cases for method putString.
+   *
+   * @return array
+   */
+  public static function casesPutSlug(): array
+  {
+    return [['value'    => null,
+             'expected' => ''],
+            ['value'    => 'Perché l\'erba è verde?',
+             'expected' => '/perche-l-erba-e-verde.html']];
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns test cases for method putString.
+   *
+   * @return array
+   */
+  public static function casesPutString(): array
+  {
+    return CgiTest::casesPutUrl();
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns test cases for method putUrl.
+   *
+   * @return array
+   */
+  public static function casesPutUrl(): array
+  {
+    return [['variable' => 'foo',
+             'value'    => null,
+             'expected' => ''],  // Test for empty string.
+            ['variable' => 'foo',
+             'value'    => '',
+             'expected' => ''],  // Test for empty string.
+            ['variable' => 'foo',
+             'value'    => 'bar',
+             'expected' => '/foo/bar'],  // Test for normal string.
+            ['variable' => 'foo',
+             'value'    => '/',
+             'expected' => '/foo/%2F'],  // Test for special characters.
+            ['variable' => 'foo',
+             'value'    => 'https://www.setbased.nl/',
+             'expected' => '/foo/https%3A%2F%2Fwww.setbased.nl%2F']];  // Test for special characters.
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns invalid test cases for method getManUrl.
+   *
+   * @return array
+   */
+  public static function invalidCasesGetManString(): array
+  {
+    $cases = CgiTest::invalidCasesGetOptString();
+
+    // Empty values.
+    $cases[] = ['variable' => 'foo',
+                'value'    => '',
+                'unset'    => null];
+
+    $cases[] = ['variable' => 'foo',
+                'value'    => null,
+                'unset'    => false];
+
+    $cases[] = ['variable' => 'foo',
+                'value'    => null,
+                'unset'    => true];
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns invalid test cases for method getManUrl.
+   *
+   * @return array
+   */
+  public static function invalidCasesGetManUrl(): array
+  {
+    $cases = CgiTest::invalidCasesGetOptUrl();
+
+    // Empty CGI variable: key exists but value is null.
+    $cases[] = ['variable'      => 'foo',
+                'value'         => null,
+                'default'       => null,
+                'forceRelative' => true,
+                'unset'         => false];
+
+    // Empty CGI variable: key exists but value is empty string.
+    $cases[] = ['variable'      => 'foo',
+                'value'         => '',
+                'default'       => null,
+                'forceRelative' => true,
+                'unset'         => null];
+
+    // Empty CGI variable: key does not exist.
+    $cases[] = ['variable'      => 'foo',
+                'value'         => null,
+                'default'       => null,
+                'forceRelative' => true,
+                'unset'         => true];
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns invalid test cases for method getOptUrl.
+   *
+   * @return array
+   */
+  public static function invalidCasesGetOptString(): array
+  {
+    $cases = [];
+
+    // A resource can not be cast to a string.
+    $cases[] = ['variable' => 'foo',
+                'value'    => fopen('php://stdin', 'r'),
+                'unset'    => null];
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns invalid test cases for method getOptUrl.
+   *
+   * @return array
+   */
+  public static function invalidCasesGetOptUrl(): array
+  {
+    $cases = [];
+
+    // Absolute URL and relative URL is forced.
+    $cases[] = ['variable'      => 'foo',
+                'value'         => 'https://www.setbased.nl/',
+                'default'       => null,
+                'forceRelative' => true,
+                'unset'         => null];
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns valid test cases for method getManString.
+   *
+   * @return array
+   */
+  public static function validCasesGetManString(): array
+  {
+    $cases = [];
+
+    // Test for null with default.
+    $cases[] = ['variable' => 'foo',
+                'value'    => null,
+                'default'  => 'bar',
+                'expected' => 'bar'];
+
+    // Test for empty string with default.
+    $cases[] = ['variable' => 'foo',
+                'value'    => '',
+                'default'  => 'bar',
+                'expected' => 'bar'];
+
+    // Test for normal string.
+    $cases[] = ['variable' => 'foo',
+                'value'    => 'bar',
+                'default'  => null,
+                'expected' => 'bar'];
+
+    // Test for normal string with default.
+    $cases[] = ['variable' => 'foo',
+                'value'    => 'bar',
+                'default'  => 'eggs',
+                'expected' => 'bar'];
+
+    // Test for special characters.
+    $cases[] = ['variable' => 'foo',
+                'value'    => '/',
+                'default'  => null,
+                'expected' => '/'];
+
+    $cases[] = ['variable' => 'foo',
+                'value'    => 'https://www.setbased.nl/',
+                'default'  => null,
+                'expected' => 'https://www.setbased.nl/'];
+
+    // Test for special characters with default.
+    $cases[] = ['variable' => 'foo',
+                'value'    => '/',
+                'default'  => 'spam',
+                'expected' => '/'];
+
+    $cases[] = ['variable' => 'foo',
+                'value'    => 'https://www.setbased.nl/',
+                'default'  => 'spam',
+                'expected' => 'https://www.setbased.nl/'];
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns valid test cases for method getManUrl.
+   *
+   * @return array
+   */
+  public static function validCasesGetManUrl(): array
+  {
+    $cases = [];
+
+    // Test for null with default.
+    $cases[] = ['variable'      => 'foo',
+                'value'         => null,
+                'default'       => '/bar',
+                'forceRelative' => true,
+                'expected'      => '/bar'];
+
+    // Tests for special characters.
+    $cases[] = ['variable'      => 'foo',
+                'value'         => '/',
+                'default'       => null,
+                'forceRelative' => true,
+                'expected'      => '/'];
+
+    $cases[] = ['variable'      => 'foo',
+                'value'         => 'https://www.setbased.nl/',
+                'default'       => null,
+                'forceRelative' => false,
+                'expected'      => 'https://www.setbased.nl/'];
+
+    // Test for special characters with default.
+    $cases[] = ['variable'      => 'foo',
+                'value'         => '/',
+                'default'       => 'spam',
+                'forceRelative' => true,
+                'expected'      => '/'];
+
+    $cases[] = ['variable'      => 'foo',
+                'value'         => 'https://www.setbased.nl/',
+                'default'       => 'spam',
+                'forceRelative' => false,
+                'expected'      => 'https://www.setbased.nl/'];
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns valid test cases for method getOptString.
+   *
+   * @return array
+   */
+  public static function validCasesGetOptString(): array
+  {
+    $cases = CgiTest::validCasesGetManString();
+
+    // Test for null.
+    $cases[] = ['variable' => 'foo',
+                'value'    => null,
+                'default'  => null,
+                'expected' => null];
+
+    // Test for empty string.
+    $cases[] = ['variable' => 'foo',
+                'value'    => '',
+                'default'  => null,
+                'expected' => null];
+
+    return $cases;
+  }
+
+  //--------------------------------------------------------------------------------------------------------------------
+  /**
+   * Returns valid test cases for method getManUrl.
+   *
+   * @return array
+   */
+  public static function validCasesGetOptUrl(): array
+  {
+    $cases = CgiTest::validCasesGetManUrl();
+
+    // Test for null.
+    $cases[] = ['variable'      => 'foo',
+                'value'         => null,
+                'default'       => null,
+                'forceRelative' => true,
+                'expected'      => null];
+
+    // Test for null with default.
+    $cases[] = ['variable'      => 'foo',
+                'value'         => null,
+                'default'       => '/bar',
+                'forceRelative' => true,
+                'expected'      => '/bar'];
+
+    return $cases;
+  }
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -153,262 +567,6 @@ abstract class CgiTest extends TestCase
   {
     $_GET['foo'] = 'hello';
     $this->kernel->cgi->$method('foo');
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns test cases for method putBool.
-   *
-   * @return array
-   */
-  public function casesPutBool(): array
-  {
-    $cases = [];
-
-    // Test cases for true.
-    $cases[] = ['variable'  => 'foo',
-                'value'     => true,
-                'mandatory' => false,
-                'expected'  => '/foo/1'];
-
-    $cases[] = ['variable'  => 'foo',
-                'value'     => true,
-                'mandatory' => true,
-                'expected'  => '/foo/1'];
-
-    // Test cases for false.
-    $cases[] = ['variable'  => 'foo',
-                'value'     => false,
-                'mandatory' => true,
-                'expected'  => '/foo/0'];
-
-    $cases[] = ['variable'  => 'foo',
-                'value'     => false,
-                'mandatory' => false,
-                'expected'  => ''];
-
-    // Test cases for null.
-    $cases[] = ['variable'  => 'foo',
-                'value'     => null,
-                'mandatory' => false,
-                'expected'  => ''];
-
-    $cases[] = ['variable'  => 'foo',
-                'value'     => null,
-                'mandatory' => true,
-                'expected'  => ''];
-
-    return $cases;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns test cases for method putUrl.
-   *
-   * @return array
-   */
-  public function casesPutFloat(): array
-  {
-    return [['variable' => 'foo',
-             'value'    => null,
-             'expected' => ''],
-            ['variable' => 'foo',
-             'value'    => 0.0,
-             'expected' => '/foo/0'],
-            ['variable' => 'foo',
-             'value'    => 123.45,
-             'expected' => '/foo/123.45']];
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns test cases for method putId.
-   *
-   * @return array
-   */
-  public function casesPutId(): array
-  {
-    $this->setUp();
-
-    return [['variable' => 'foo',
-             'value'    => null,
-             'label'    => 'foo',
-             'expected' => ''],
-            ['variable' => 'foo',
-             'value'    => 0,
-             'label'    => 'foo',
-             'expected' => '/foo/'.$this->kernel->obfuscator::encode(0, 'foo')],
-            ['variable' => 'foo',
-             'value'    => 123,
-             'label'    => 'foo',
-             'expected' => '/foo/'.$this->kernel->obfuscator::encode(123, 'foo')]];
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns test cases for method putInt.
-   *
-   * @return array
-   */
-  public function casesPutInt(): array
-  {
-    return [['variable' => 'foo',
-             'value'    => null,
-             'expected' => ''],
-            ['variable' => 'foo',
-             'value'    => 0,
-             'expected' => '/foo/0'],
-            ['variable' => 'foo',
-             'value'    => 123456,
-             'expected' => '/foo/123456']];
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns test cases for method putString.
-   *
-   * @return array
-   */
-  public function casesPutSlug(): array
-  {
-    return [['value'    => null,
-             'expected' => ''],
-            ['value'    => 'Perché l\'erba è verde?',
-             'expected' => '/perche-l-erba-e-verde.html']];
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns test cases for method putString.
-   *
-   * @return array
-   */
-  public function casesPutString(): array
-  {
-    return $this->casesPutUrl();
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns test cases for method putUrl.
-   *
-   * @return array
-   */
-  public function casesPutUrl(): array
-  {
-    return [['variable' => 'foo',
-             'value'    => null,
-             'expected' => ''],  // Test for empty string.
-            ['variable' => 'foo',
-             'value'    => '',
-             'expected' => ''],  // Test for empty string.
-            ['variable' => 'foo',
-             'value'    => 'bar',
-             'expected' => '/foo/bar'],  // Test for normal string.
-            ['variable' => 'foo',
-             'value'    => '/',
-             'expected' => '/foo/%2F'],  // Test for special characters.
-            ['variable' => 'foo',
-             'value'    => 'https://www.setbased.nl/',
-             'expected' => '/foo/https%3A%2F%2Fwww.setbased.nl%2F']];  // Test for special characters.
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns invalid test cases for method getManUrl.
-   *
-   * @return array
-   */
-  public function invalidCasesGetManString(): array
-  {
-    $cases = $this->invalidCasesGetOptString();
-
-    // Empty values.
-    $cases[] = ['variable' => 'foo',
-                'value'    => '',
-                'unset'    => null];
-
-    $cases[] = ['variable' => 'foo',
-                'value'    => null,
-                'unset'    => false];
-
-    $cases[] = ['variable' => 'foo',
-                'value'    => null,
-                'unset'    => true];
-
-    return $cases;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns invalid test cases for method getManUrl.
-   *
-   * @return array
-   */
-  public function invalidCasesGetManUrl(): array
-  {
-    $cases = $this->invalidCasesGetOptUrl();
-
-    // Empty CGI variable: key exists but value is null.
-    $cases[] = ['variable'      => 'foo',
-                'value'         => null,
-                'default'       => null,
-                'forceRelative' => true,
-                'unset'         => false];
-
-    // Empty CGI variable: key exists but value is empty string.
-    $cases[] = ['variable'      => 'foo',
-                'value'         => '',
-                'default'       => null,
-                'forceRelative' => true,
-                'unset'         => null];
-
-    // Empty CGI variable: key does not exists.
-    $cases[] = ['variable'      => 'foo',
-                'value'         => null,
-                'default'       => null,
-                'forceRelative' => true,
-                'unset'         => true];
-
-    return $cases;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns invalid test cases for method getOptUrl.
-   *
-   * @return array
-   */
-  public function invalidCasesGetOptString(): array
-  {
-    $cases = [];
-
-    // A resource can not be casted to a string.
-    $cases[] = ['variable' => 'foo',
-                'value'    => fopen('php://stdin', 'r'),
-                'unset'    => null];
-
-    return $cases;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns invalid test cases for method getOptUrl.
-   *
-   * @return array
-   */
-  public function invalidCasesGetOptUrl(): array
-  {
-    $cases = [];
-
-    // Absolute URL and relative URL is forced.
-    $cases[] = ['variable'      => 'foo',
-                'value'         => 'https://www.setbased.nl/',
-                'default'       => null,
-                'forceRelative' => true,
-                'unset'         => null];
-
-    return $cases;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -548,7 +706,7 @@ abstract class CgiTest extends TestCase
   /**
    * Test cases for getManId.
    */
-  public function testGetManId2()
+  public function testGetManId2(): void
   {
     $this->expectException(\Exception::class);
     $this->baseGetId2('getManId');
@@ -719,7 +877,7 @@ abstract class CgiTest extends TestCase
   /**
    * Test cases for getOptId.
    */
-  public function testGetOptId2()
+  public function testGetOptId2(): void
   {
     $this->expectException(\Exception::class);
     $this->baseGetId2('getOptId');
@@ -751,10 +909,9 @@ abstract class CgiTest extends TestCase
    * @param string    $variable The name of the CGI variable.
    * @param mixed     $value    The value of the CGI variable.
    * @param bool|null $unset    If true the CGI variable will be unset.
-   *
-   * @dataProvider invalidCasesGetManString
    */
-  public function testInvalidGetManString(string $variable, $value, ?bool $unset): void
+  #[DataProvider('invalidCasesGetManString')]
+  public function testInvalidGetManString(string $variable, mixed $value, ?bool $unset): void
   {
     if ($unset)
     {
@@ -778,14 +935,13 @@ abstract class CgiTest extends TestCase
    * @param string|null $default       The default value.
    * @param bool        $forceRelative The force relative flag.
    * @param bool|null   $unset         If true the CGI variable will be unset.
-   *
-   * @dataProvider invalidCasesGetManUrl
    */
-  public function testInvalidGetManUrl(string $variable,
+  #[DataProvider('invalidCasesGetManUrl')]
+  public function testInvalidGetManUrl(string  $variable,
                                        ?string $value,
                                        ?string $default,
-                                       bool $forceRelative,
-                                       ?bool $unset): void
+                                       bool    $forceRelative,
+                                       ?bool   $unset): void
   {
     if ($unset)
     {
@@ -800,6 +956,7 @@ abstract class CgiTest extends TestCase
     $this->kernel->cgi->getManUrl($variable, $default, $forceRelative);
   }
 
+
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Invalid test cases for getOptString.
@@ -807,10 +964,9 @@ abstract class CgiTest extends TestCase
    * @param string    $variable The name of the CGI variable.
    * @param mixed     $value    The value of the CGI variable.
    * @param bool|null $unset    If true the CGI variable will be unset.
-   *
-   * @dataProvider invalidCasesGetOptString
    */
-  public function testInvalidGetOptString(string $variable, $value, ?bool $unset): void
+  #[DataProvider('invalidCasesGetOptString')]
+  public function testInvalidGetOptString(string $variable, mixed $value, ?bool $unset): void
   {
     if ($unset)
     {
@@ -834,14 +990,13 @@ abstract class CgiTest extends TestCase
    * @param string|null $default       The default value.
    * @param bool        $forceRelative The force relative flag.
    * @param bool|null   $unset         If true the CGI variable will be unset.
-   *
-   * @dataProvider invalidCasesGetOptUrl
    */
-  public function testInvalidGetOptUrl(string $variable,
+  #[DataProvider('invalidCasesGetOptUrl')]
+  public function testInvalidGetOptUrl(string  $variable,
                                        ?string $value,
                                        ?string $default,
-                                       bool $forceRelative,
-                                       ?bool $unset): void
+                                       bool    $forceRelative,
+                                       ?bool   $unset): void
   {
     if ($unset)
     {
@@ -864,9 +1019,8 @@ abstract class CgiTest extends TestCase
    * @param bool|null $value     The value of the CGI variable.
    * @param bool      $mandatory The mandatory flag.
    * @param string    $expected  The expected result.
-   *
-   * @dataProvider casesPutBool
    */
+  #[DataProvider('casesPutBool')]
   public function testPutBool(string $variable, ?bool $value, bool $mandatory, string $expected): void
   {
     $part = $this->kernel->cgi->putBool($variable, $value, $mandatory);
@@ -880,15 +1034,13 @@ abstract class CgiTest extends TestCase
    * @param string     $variable The name of the CGI variable.
    * @param float|null $value    The value of the CGI variable.
    * @param string     $expected The expected result.
-   *
-   * @dataProvider casesPutFloat
    */
+  #[DataProvider('casesPutFloat')]
   public function testPutFloat(string $variable, ?float $value, string $expected): void
   {
     $part = $this->kernel->cgi->putFloat($variable, $value);
     self::assertSame($expected, $part);
   }
-
 
   //--------------------------------------------------------------------------------------------------------------------
   /**
@@ -898,9 +1050,8 @@ abstract class CgiTest extends TestCase
    * @param int|null    $value    The value of the CGI variable.
    * @param string|null $label    The alias for the column holding database ID.
    * @param string      $expected The expected result.
-   *
-   * @dataProvider casesPutId
    */
+  #[DataProvider('casesPutId')]
   public function testPutId(string $variable, ?int $value, ?string $label, string $expected): void
   {
     $part = $this->kernel->cgi->putId($variable, $value, $label);
@@ -914,9 +1065,8 @@ abstract class CgiTest extends TestCase
    * @param string   $variable The name of the CGI variable.
    * @param int|null $value    The value of the CGI variable.
    * @param string   $expected The expected result.
-   *
-   * @dataProvider casesPutInt
    */
+  #[DataProvider('casesPutInt')]
   public function testPutInt(string $variable, ?int $value, string $expected): void
   {
     $part = $this->kernel->cgi->putInt($variable, $value);
@@ -929,9 +1079,8 @@ abstract class CgiTest extends TestCase
    *
    * @param string|null $value    The value of the CGI variable.
    * @param string      $expected The expected result.
-   *
-   * @dataProvider casesPutSlug
    */
+  #[DataProvider('casesPutSlug')]
   public function testPutSlugName(?string $value, string $expected): void
   {
     $part = $this->kernel->cgi->putSlugName($value);
@@ -945,9 +1094,8 @@ abstract class CgiTest extends TestCase
    * @param string      $variable The name of the CGI variable.
    * @param string|null $value    The value of the CGI variable.
    * @param string      $expected The expected result.
-   *
-   * @dataProvider casesPutString
    */
+  #[DataProvider('casesPutString')]
   public function testPutString(string $variable, ?string $value, string $expected): void
   {
     $part = $this->kernel->cgi->putUrl($variable, $value);
@@ -961,15 +1109,13 @@ abstract class CgiTest extends TestCase
    * @param string      $variable The name of the CGI variable.
    * @param string|null $value    The value of the CGI variable.
    * @param string      $expected The expected result.
-   *
-   * @dataProvider casesPutUrl
    */
+  #[DataProvider('casesPutUrl')]
   public function testPutUrl(string $variable, ?string $value, string $expected): void
   {
     $part = $this->kernel->cgi->putUrl($variable, $value);
     self::assertSame($expected, $part);
   }
-
   //--------------------------------------------------------------------------------------------------------------------
   /**
    * Valid test cases for getManString.
@@ -978,13 +1124,12 @@ abstract class CgiTest extends TestCase
    * @param string|null $value    The value of the CGI variable.
    * @param string|null $default  The default value.
    * @param string      $expected The expected result.
-   *
-   * @dataProvider validCasesGetManString
    */
-  public function testValidGetManString(string $variable,
+  #[DataProvider('validCasesGetManString')]
+  public function testValidGetManString(string  $variable,
                                         ?string $value,
                                         ?string $default,
-                                        string $expected): void
+                                        string  $expected): void
   {
     $_GET[$variable] = $value;
     $url             = $this->kernel->cgi->getManString($variable, $default);
@@ -1007,14 +1152,13 @@ abstract class CgiTest extends TestCase
    * @param string|null $default       The default value.
    * @param bool        $forceRelative The force relative flag.
    * @param string      $expected      The expected result.
-   *
-   * @dataProvider validCasesGetManUrl
    */
-  public function testValidGetManUrl(string $variable,
+  #[DataProvider('validCasesGetManUrl')]
+  public function testValidGetManUrl(string  $variable,
                                      ?string $value,
                                      ?string $default,
-                                     bool $forceRelative,
-                                     string $expected): void
+                                     bool    $forceRelative,
+                                     string  $expected): void
   {
     $_GET[$variable] = $value;
     $url             = $this->kernel->cgi->getManUrl($variable, $default, $forceRelative);
@@ -1035,11 +1179,10 @@ abstract class CgiTest extends TestCase
    * @param string      $variable The name of the CGI variable.
    * @param string|null $value    The value of the CGI variable.
    * @param string|null $default  The default value.
-   * @param string      $expected The expected result.
-   *
-   * @dataProvider validCasesGetOptString
+   * @param string|null $expected The expected result.
    */
-  public function testValidGetOptString(string $variable,
+  #[DataProvider('validCasesGetOptString')]
+  public function testValidGetOptString(string  $variable,
                                         ?string $value,
                                         ?string $default,
                                         ?string $expected): void
@@ -1065,13 +1208,12 @@ abstract class CgiTest extends TestCase
    * @param string|null $default       The default value.
    * @param bool        $forceRelative The force relative flag.
    * @param string|null $expected      The expected result.
-   *
-   * @dataProvider validCasesGetOptUrl
    */
-  public function testValidGetOptUrl(string $variable,
+  #[DataProvider('validCasesGetOptUrl')]
+  public function testValidGetOptUrl(string  $variable,
                                      ?string $value,
                                      ?string $default,
-                                     bool $forceRelative,
+                                     bool    $forceRelative,
                                      ?string $expected): void
   {
     $_GET[$variable] = $value;
@@ -1084,162 +1226,6 @@ abstract class CgiTest extends TestCase
       $url = $this->kernel->cgi->getOptUrl($variable, $default, $forceRelative);
       self::assertSame($expected, $url);
     }
-  }
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns valid test cases for method getManString.
-   *
-   * @return array
-   */
-  public function validCasesGetManString(): array
-  {
-    $cases = [];
-
-    // Test for null with default.
-    $cases[] = ['variable' => 'foo',
-                'value'    => null,
-                'default'  => 'bar',
-                'expected' => 'bar'];
-
-    // Test for empty string with default.
-    $cases[] = ['variable' => 'foo',
-                'value'    => '',
-                'default'  => 'bar',
-                'expected' => 'bar'];
-
-    // Test for normal string.
-    $cases[] = ['variable' => 'foo',
-                'value'    => 'bar',
-                'default'  => null,
-                'expected' => 'bar'];
-
-    // Test for normal string with default.
-    $cases[] = ['variable' => 'foo',
-                'value'    => 'bar',
-                'default'  => 'eggs',
-                'expected' => 'bar'];
-
-    // Test for special characters.
-    $cases[] = ['variable' => 'foo',
-                'value'    => '/',
-                'default'  => null,
-                'expected' => '/'];
-
-    $cases[] = ['variable' => 'foo',
-                'value'    => 'https://www.setbased.nl/',
-                'default'  => null,
-                'expected' => 'https://www.setbased.nl/'];
-
-    // Test for special characters with default.
-    $cases[] = ['variable' => 'foo',
-                'value'    => '/',
-                'default'  => 'spam',
-                'expected' => '/'];
-
-    $cases[] = ['variable' => 'foo',
-                'value'    => 'https://www.setbased.nl/',
-                'default'  => 'spam',
-                'expected' => 'https://www.setbased.nl/'];
-
-    return $cases;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns valid test cases for method getManUrl.
-   *
-   * @return array
-   */
-  public function validCasesGetManUrl(): array
-  {
-    $cases = [];
-
-    // Test for null with default.
-    $cases[] = ['variable'      => 'foo',
-                'value'         => null,
-                'default'       => '/bar',
-                'forceRelative' => true,
-                'expected'      => '/bar'];
-
-    // Tests for special characters.
-    $cases[] = ['variable'      => 'foo',
-                'value'         => '/',
-                'default'       => null,
-                'forceRelative' => true,
-                'expected'      => '/'];
-
-    $cases[] = ['variable'      => 'foo',
-                'value'         => 'https://www.setbased.nl/',
-                'default'       => null,
-                'forceRelative' => false,
-                'expected'      => 'https://www.setbased.nl/'];
-
-    // Test for special characters with default.
-    $cases[] = ['variable'      => 'foo',
-                'value'         => '/',
-                'default'       => 'spam',
-                'forceRelative' => true,
-                'expected'      => '/'];
-
-    $cases[] = ['variable'      => 'foo',
-                'value'         => 'https://www.setbased.nl/',
-                'default'       => 'spam',
-                'forceRelative' => false,
-                'expected'      => 'https://www.setbased.nl/'];
-
-    return $cases;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns valid test cases for method getOptString.
-   *
-   * @return array
-   */
-  public function validCasesGetOptString(): array
-  {
-    $cases = $this->validCasesGetManString();
-
-    // Test for null.
-    $cases[] = ['variable' => 'foo',
-                'value'    => null,
-                'default'  => null,
-                'expected' => null];
-
-    // Test for empty string.
-    $cases[] = ['variable' => 'foo',
-                'value'    => '',
-                'default'  => null,
-                'expected' => null];
-
-    return $cases;
-  }
-
-  //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * Returns valid test cases for method getManUrl.
-   *
-   * @return array
-   */
-  public function validCasesGetOptUrl(): array
-  {
-    $cases = $this->validCasesGetManUrl();
-
-    // Test for null.
-    $cases[] = ['variable'      => 'foo',
-                'value'         => null,
-                'default'       => null,
-                'forceRelative' => true,
-                'expected'      => null];
-
-    // Test for null with default.
-    $cases[] = ['variable'      => 'foo',
-                'value'         => null,
-                'default'       => '/bar',
-                'forceRelative' => true,
-                'expected'      => '/bar'];
-
-    return $cases;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
