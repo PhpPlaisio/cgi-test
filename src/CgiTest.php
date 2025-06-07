@@ -7,7 +7,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plaisio\Exception\InvalidUrlException;
 use Plaisio\Kernel\Nub;
-use Plaisio\PlaisioKernel;
 
 /**
  * Abstract parent class for testing concrete implementations of the Cgi interface.
@@ -17,15 +16,6 @@ use Plaisio\PlaisioKernel;
 abstract class CgiTest extends TestCase
 {
   //--------------------------------------------------------------------------------------------------------------------
-  /**
-   * The kernel for testing purposes.
-   *
-   * @var PlaisioKernel
-   */
-  protected PlaisioKernel $kernel;
-
-  //--------------------------------------------------------------------------------------------------------------------
-
   /**
    * Returns test cases for method putBool.
    *
@@ -446,28 +436,28 @@ abstract class CgiTest extends TestCase
   {
     // Test for null with default.
     $_GET['foo'] = null;
-    $value       = $this->kernel->cgi->$method('foo', 123.45);
+    $value       = Nub::$nub->cgi->$method('foo', 123.45);
     self::assertSame(123.45, $value);
 
     unset($_GET['foo']);
-    $value = $this->kernel->cgi->$method('foo', 123.45);
+    $value = Nub::$nub->cgi->$method('foo', 123.45);
     self::assertSame(123.45, $value);
 
     // Test with value.
     $_GET['foo'] = 3.14;
-    $value       = $this->kernel->cgi->$method('foo');
+    $value       = Nub::$nub->cgi->$method('foo');
     self::assertSame(3.14, $value);
 
     $_GET['foo'] = '3.14';
-    $value       = $this->kernel->cgi->$method('foo');
+    $value       = Nub::$nub->cgi->$method('foo');
     self::assertSame(3.14, $value);
 
     $_GET['foo'] = 2.71;
-    $value       = $this->kernel->cgi->$method('foo', 123.45);
+    $value       = Nub::$nub->cgi->$method('foo', 123.45);
     self::assertSame(2.71, $value);
 
     $_GET['foo'] = '2.71';
-    $value       = $this->kernel->cgi->$method('foo', 123.45);
+    $value       = Nub::$nub->cgi->$method('foo', 123.45);
     self::assertSame(2.71, $value);
   }
 
@@ -480,7 +470,7 @@ abstract class CgiTest extends TestCase
   public function baseGetFloat2(string $method): void
   {
     $_GET['foo'] = 'hello';
-    $this->kernel->cgi->$method('foo');
+    Nub::$nub->cgi->$method('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -493,20 +483,20 @@ abstract class CgiTest extends TestCase
   {
     // Test for null with default.
     $_GET['foo'] = null;
-    $value       = $this->kernel->cgi->$method('foo', 'bar', 123);
+    $value       = Nub::$nub->cgi->$method('foo', 'bar', 123);
     self::assertSame(123, $value);
 
     unset($_GET['foo']);
-    $value = $this->kernel->cgi->$method('foo', 'bar', 123);
+    $value = Nub::$nub->cgi->$method('foo', 'bar', 123);
     self::assertSame(123, $value);
 
     // Test with value.
-    $_GET['foo'] = $this->kernel->obfuscator::encode(3, 'bar');
-    $value       = $this->kernel->cgi->$method('foo', 'bar');
+    $_GET['foo'] = Nub::$nub->obfuscator::encode(3, 'bar');
+    $value       = Nub::$nub->cgi->$method('foo', 'bar');
     self::assertSame(3, $value);
 
-    $_GET['foo'] = $this->kernel->obfuscator::encode(2, 'bar');
-    $value       = $this->kernel->cgi->$method('foo', 'bar', 123);
+    $_GET['foo'] = Nub::$nub->obfuscator::encode(2, 'bar');
+    $value       = Nub::$nub->cgi->$method('foo', 'bar', 123);
     self::assertSame(2, $value);
   }
 
@@ -519,7 +509,7 @@ abstract class CgiTest extends TestCase
   public function baseGetId2(string $method): void
   {
     $_GET['foo'] = 'hello';
-    $this->kernel->cgi->$method('foo', 'bar');
+    Nub::$nub->cgi->$method('foo', 'bar');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -532,28 +522,28 @@ abstract class CgiTest extends TestCase
   {
     // Test for null with default.
     $_GET['foo'] = null;
-    $value       = $this->kernel->cgi->$method('foo', 123);
+    $value       = Nub::$nub->cgi->$method('foo', 123);
     self::assertSame(123, $value);
 
     unset($_GET['foo']);
-    $value = $this->kernel->cgi->$method('foo', 123);
+    $value = Nub::$nub->cgi->$method('foo', 123);
     self::assertSame(123, $value);
 
     // Test with value.
     $_GET['foo'] = 3;
-    $value       = $this->kernel->cgi->$method('foo');
+    $value       = Nub::$nub->cgi->$method('foo');
     self::assertSame(3, $value);
 
     $_GET['foo'] = '3';
-    $value       = $this->kernel->cgi->$method('foo');
+    $value       = Nub::$nub->cgi->$method('foo');
     self::assertSame(3, $value);
 
     $_GET['foo'] = 2;
-    $value       = $this->kernel->cgi->$method('foo', 123);
+    $value       = Nub::$nub->cgi->$method('foo', 123);
     self::assertSame(2, $value);
 
     $_GET['foo'] = '2';
-    $value       = $this->kernel->cgi->$method('foo', 123);
+    $value       = Nub::$nub->cgi->$method('foo', 123);
     self::assertSame(2, $value);
   }
 
@@ -566,7 +556,7 @@ abstract class CgiTest extends TestCase
   public function baseGetInt2(string $method): void
   {
     $_GET['foo'] = 'hello';
-    $this->kernel->cgi->$method('foo');
+    Nub::$nub->cgi->$method('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -577,28 +567,28 @@ abstract class CgiTest extends TestCase
   {
     // Tests for true.
     $_GET['foo'] = '1';
-    $value       = $this->kernel->cgi->getManBool('foo');
+    $value       = Nub::$nub->cgi->getManBool('foo');
     self::assertSame(true, $value);
 
     $_GET['foo'] = null;
-    $value       = $this->kernel->cgi->getManBool('foo', true);
+    $value       = Nub::$nub->cgi->getManBool('foo', true);
     self::assertSame(true, $value);
 
     unset($_GET['foo']);
-    $value = $this->kernel->cgi->getManBool('foo', true);
+    $value = Nub::$nub->cgi->getManBool('foo', true);
     self::assertSame(true, $value);
 
     // Tests for false.
     $_GET['foo'] = '0';
-    $value       = $this->kernel->cgi->getManBool('foo');
+    $value       = Nub::$nub->cgi->getManBool('foo');
     self::assertSame(false, $value);
 
     $_GET['foo'] = null;
-    $value       = $this->kernel->cgi->getManBool('foo', false);
+    $value       = Nub::$nub->cgi->getManBool('foo', false);
     self::assertSame(false, $value);
 
     unset($_GET['foo']);
-    $value = $this->kernel->cgi->getManBool('foo', false);
+    $value = Nub::$nub->cgi->getManBool('foo', false);
     self::assertSame(false, $value);
   }
 
@@ -611,7 +601,7 @@ abstract class CgiTest extends TestCase
     $_GET['foo'] = 'hello, world';
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManBool('foo');
+    Nub::$nub->cgi->getManBool('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -623,7 +613,7 @@ abstract class CgiTest extends TestCase
     $_GET['foo'] = '';
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManBool('foo');
+    Nub::$nub->cgi->getManBool('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -635,7 +625,7 @@ abstract class CgiTest extends TestCase
     unset($_GET['foo']);
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManBool('foo');
+    Nub::$nub->cgi->getManBool('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -666,7 +656,7 @@ abstract class CgiTest extends TestCase
     $_GET['foo'] = '';
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManFloat('foo');
+    Nub::$nub->cgi->getManFloat('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -678,7 +668,7 @@ abstract class CgiTest extends TestCase
     unset($_GET['foo']);
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManFloat('foo');
+    Nub::$nub->cgi->getManFloat('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -690,7 +680,7 @@ abstract class CgiTest extends TestCase
     $_GET['foo'] = 'qwerty';
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManFloat('foo');
+    Nub::$nub->cgi->getManFloat('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -721,7 +711,7 @@ abstract class CgiTest extends TestCase
     $_GET['foo'] = '';
 
     $this->expectException(\Exception::class);
-    $this->kernel->cgi->getManId('foo', 'bar');
+    Nub::$nub->cgi->getManId('foo', 'bar');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -733,7 +723,7 @@ abstract class CgiTest extends TestCase
     unset($_GET['foo']);
 
     $this->expectException(\Exception::class);
-    $this->kernel->cgi->getManId('foo', 'bar');
+    Nub::$nub->cgi->getManId('foo', 'bar');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -764,7 +754,7 @@ abstract class CgiTest extends TestCase
     $_GET['foo'] = '';
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManInt('foo');
+    Nub::$nub->cgi->getManInt('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -776,7 +766,7 @@ abstract class CgiTest extends TestCase
     unset($_GET['foo']);
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManInt('foo');
+    Nub::$nub->cgi->getManInt('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -788,7 +778,7 @@ abstract class CgiTest extends TestCase
     $_GET['foo'] = 'qwerty';
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManInt('foo');
+    Nub::$nub->cgi->getManInt('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -799,37 +789,37 @@ abstract class CgiTest extends TestCase
   {
     // Tests for true.
     $_GET['foo'] = '1';
-    $value       = $this->kernel->cgi->getOptBool('foo');
+    $value       = Nub::$nub->cgi->getOptBool('foo');
     self::assertSame(true, $value);
 
     $_GET['foo'] = null;
-    $value       = $this->kernel->cgi->getOptBool('foo', true);
+    $value       = Nub::$nub->cgi->getOptBool('foo', true);
     self::assertSame(true, $value);
 
     unset($_GET['foo']);
-    $value = $this->kernel->cgi->getOptBool('foo', true);
+    $value = Nub::$nub->cgi->getOptBool('foo', true);
     self::assertSame(true, $value);
 
     // Tests for false.
     $_GET['foo'] = '0';
-    $value       = $this->kernel->cgi->getOptBool('foo');
+    $value       = Nub::$nub->cgi->getOptBool('foo');
     self::assertSame(false, $value);
 
     $_GET['foo'] = null;
-    $value       = $this->kernel->cgi->getOptBool('foo', false);
+    $value       = Nub::$nub->cgi->getOptBool('foo', false);
     self::assertSame(false, $value);
 
     unset($_GET['foo']);
-    $value = $this->kernel->cgi->getOptBool('foo', false);
+    $value = Nub::$nub->cgi->getOptBool('foo', false);
     self::assertSame(false, $value);
 
     // Tests for null.
     $_GET['foo'] = null;
-    $value       = $this->kernel->cgi->getOptBool('foo');
+    $value       = Nub::$nub->cgi->getOptBool('foo');
     self::assertNull($value);
 
     unset($_GET['foo']);
-    $value = $this->kernel->cgi->getOptBool('foo');
+    $value = Nub::$nub->cgi->getOptBool('foo');
     self::assertNull($value);
   }
 
@@ -842,7 +832,7 @@ abstract class CgiTest extends TestCase
     $_GET['foo'] = 'hello, world';
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getOptBool('foo');
+    Nub::$nub->cgi->getOptBool('foo');
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -923,7 +913,7 @@ abstract class CgiTest extends TestCase
     }
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManString($variable);
+    Nub::$nub->cgi->getManString($variable);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -953,7 +943,7 @@ abstract class CgiTest extends TestCase
     }
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getManUrl($variable, $default, $forceRelative);
+    Nub::$nub->cgi->getManUrl($variable, $default, $forceRelative);
   }
 
 
@@ -978,7 +968,7 @@ abstract class CgiTest extends TestCase
     }
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getOptString($variable);
+    Nub::$nub->cgi->getOptString($variable);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -1008,7 +998,7 @@ abstract class CgiTest extends TestCase
     }
 
     $this->expectException(InvalidUrlException::class);
-    $this->kernel->cgi->getOptUrl($variable, $default, $forceRelative);
+    Nub::$nub->cgi->getOptUrl($variable, $default, $forceRelative);
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -1023,7 +1013,7 @@ abstract class CgiTest extends TestCase
   #[DataProvider('casesPutBool')]
   public function testPutBool(string $variable, ?bool $value, bool $mandatory, string $expected): void
   {
-    $part = $this->kernel->cgi->putBool($variable, $value, $mandatory);
+    $part = Nub::$nub->cgi->putBool($variable, $value, $mandatory);
     self::assertSame($expected, $part);
   }
 
@@ -1038,7 +1028,7 @@ abstract class CgiTest extends TestCase
   #[DataProvider('casesPutFloat')]
   public function testPutFloat(string $variable, ?float $value, string $expected): void
   {
-    $part = $this->kernel->cgi->putFloat($variable, $value);
+    $part = Nub::$nub->cgi->putFloat($variable, $value);
     self::assertSame($expected, $part);
   }
 
@@ -1054,7 +1044,7 @@ abstract class CgiTest extends TestCase
   #[DataProvider('casesPutId')]
   public function testPutId(string $variable, ?int $value, ?string $label, string $expected): void
   {
-    $part = $this->kernel->cgi->putId($variable, $value, $label);
+    $part = Nub::$nub->cgi->putId($variable, $value, $label);
     self::assertSame($expected, $part);
   }
 
@@ -1069,7 +1059,7 @@ abstract class CgiTest extends TestCase
   #[DataProvider('casesPutInt')]
   public function testPutInt(string $variable, ?int $value, string $expected): void
   {
-    $part = $this->kernel->cgi->putInt($variable, $value);
+    $part = Nub::$nub->cgi->putInt($variable, $value);
     self::assertSame($expected, $part);
   }
 
@@ -1083,7 +1073,7 @@ abstract class CgiTest extends TestCase
   #[DataProvider('casesPutSlug')]
   public function testPutSlugName(?string $value, string $expected): void
   {
-    $part = $this->kernel->cgi->putSlugName($value);
+    $part = Nub::$nub->cgi->putSlugName($value);
     self::assertSame($expected, $part);
   }
 
@@ -1098,7 +1088,7 @@ abstract class CgiTest extends TestCase
   #[DataProvider('casesPutString')]
   public function testPutString(string $variable, ?string $value, string $expected): void
   {
-    $part = $this->kernel->cgi->putUrl($variable, $value);
+    $part = Nub::$nub->cgi->putUrl($variable, $value);
     self::assertSame($expected, $part);
   }
 
@@ -1113,7 +1103,7 @@ abstract class CgiTest extends TestCase
   #[DataProvider('casesPutUrl')]
   public function testPutUrl(string $variable, ?string $value, string $expected): void
   {
-    $part = $this->kernel->cgi->putUrl($variable, $value);
+    $part = Nub::$nub->cgi->putUrl($variable, $value);
     self::assertSame($expected, $part);
   }
   //--------------------------------------------------------------------------------------------------------------------
@@ -1132,13 +1122,13 @@ abstract class CgiTest extends TestCase
                                         string  $expected): void
   {
     $_GET[$variable] = $value;
-    $url             = $this->kernel->cgi->getManString($variable, $default);
+    $url             = Nub::$nub->cgi->getManString($variable, $default);
     self::assertSame($expected, $url);
 
     if ($value===null)
     {
       unset($_GET[$variable]);
-      $url = $this->kernel->cgi->getManString($variable, $default);
+      $url = Nub::$nub->cgi->getManString($variable, $default);
       self::assertSame($expected, $url);
     }
   }
@@ -1161,13 +1151,13 @@ abstract class CgiTest extends TestCase
                                      string  $expected): void
   {
     $_GET[$variable] = $value;
-    $url             = $this->kernel->cgi->getManUrl($variable, $default, $forceRelative);
+    $url             = Nub::$nub->cgi->getManUrl($variable, $default, $forceRelative);
     self::assertSame($expected, $url);
 
     if ($value===null)
     {
       unset($_GET[$variable]);
-      $url = $this->kernel->cgi->getManUrl($variable, $default, $forceRelative);
+      $url = Nub::$nub->cgi->getManUrl($variable, $default, $forceRelative);
       self::assertSame($expected, $url);
     }
   }
@@ -1188,13 +1178,13 @@ abstract class CgiTest extends TestCase
                                         ?string $expected): void
   {
     $_GET[$variable] = $value;
-    $url             = $this->kernel->cgi->getOptString($variable, $default);
+    $url             = Nub::$nub->cgi->getOptString($variable, $default);
     self::assertSame($expected, $url);
 
     if ($value===null)
     {
       unset($_GET[$variable]);
-      $url = $this->kernel->cgi->getOptString($variable, $default);
+      $url = Nub::$nub->cgi->getOptString($variable, $default);
       self::assertSame($expected, $url);
     }
   }
@@ -1217,13 +1207,13 @@ abstract class CgiTest extends TestCase
                                      ?string $expected): void
   {
     $_GET[$variable] = $value;
-    $url             = $this->kernel->cgi->getOptUrl($variable, $default, $forceRelative);
+    $url             = Nub::$nub->cgi->getOptUrl($variable, $default, $forceRelative);
     self::assertSame($expected, $url);
 
     if ($value===null)
     {
       unset($_GET[$variable]);
-      $url = $this->kernel->cgi->getOptUrl($variable, $default, $forceRelative);
+      $url = Nub::$nub->cgi->getOptUrl($variable, $default, $forceRelative);
       self::assertSame($expected, $url);
     }
   }
